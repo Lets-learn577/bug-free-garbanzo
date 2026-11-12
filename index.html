@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning JavaScript</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <nav>
+        <div class="brand-name">🚖Faauzps's Taxi</div>
+        <div class="punch-line">Roblox Taxi Boss City</div>
+    </nav>
+    <div id="hero">
+        ⭐ Rating : <span style="color: var(--primary);">3.5</span>
+    </div>
+    <section>
+        <h1 id="fr">Fast Rides,<span style="color: var(--primary);"> Max Bucks.</span></h1>
+
+        <p style="text-align: center; margin: 10px; color: silver; font-weight: 500;">Covering every studs of the map.
+        </p>
+        <div id="form">
+            <h3>
+                <div style="color: var(--primary);">Estimate <span style="color: var(--text);">Your Fare💵</span>
+            </h3>
+            <label id="car-name" for="car-name">Select Car:</label>
+            <select id="car-select">
+                <option value="none">--select car--</option>
+                <option value="1">Natsuna-SX2</option>
+                <option value="1.5">Natsuda-MX2</option>
+                <option value="2.5">Dodge Dajuan</option>
+                <option value="3">Matsuda-MK4</option>
+                <option value="5">Range Land</option>
+            </select><br>
+            <label id="boarding">Boarding Point:</label>
+            <select id="boarding-point" required>
+                <option value="">--boarding point--</option>
+                <option>Cobra Tuning Shop</option>
+                <option>Industrial City</option>
+                <option>Old Minister School</option>
+                <option>Boss Airport</option>
+            </select>
+            <label for="destination">Destination:</label>
+            <select name="destination" id="destination-point">
+                <option value="none">--destination--</option>
+                <option>Cobra Tuning Shop</option>
+                <option>Industrial City</option>
+                <option>Old Minister School</option>
+                <option>Boss Airport</option>
+            </select>
+            <button id="calculate-fare">Calculate Fare</button>
+            <div id="receipt"></div>
+        </div>
+    </section>
+    <section id="facility">
+        <h2>Our Facilities</h2>
+        <div class="card">
+            <div class="fast">
+                <span id="tier-1">Fastest</span>
+                <h3>Very Fast Cars</h3>
+                <p>Fast and safe cars in our fleet.<br> Top Speed: 270 kmph</p>
+            </div>
+            <div class="fast">
+                <span id="tier-1" style="background-color: #ff6ce7;">Luxury</span>
+                <h3>Comfort and Luxury</h3>
+                <p>Get leather seats, air-conditioning <br>across all our fleet.</p>
+            </div>
+            <div class="fast">
+                <span id="tier-1" style="background-color:#fcee09 ;">On-Time</span>
+                <h3>Punctuality on Top</h3>
+                <p>Get on-time performance <br><span style="text-decoration: underline;">RbNPC Survey:</span> 95%
+                    on-time performance</p>
+            </div>
+        </div>
+    </section>
+
+
+
+    <script>
+        const distancematrix = {
+            "Cobra Tuning Shop": { "Industrial City": 1072, "Old Minister School": 725, "Boss Airport": 1134 },
+            "Industrial City": { "Cobra Tuning Shop": 1072, "Old Minister School": 1144, "Boss Airport": 588 },
+            "Old Minister School": { "Cobra Tuning Shop": 725, "Industrial City": 1044, "Boss Airport": 1134 },
+            "Boss Airport": { "Cobra Tuning Shop": 1134, "Industrial City": 588, "Old Minister School": 1088 }
+        }
+
+        // 1. Target your elements using clear, separate names
+        const carDropdown = document.getElementById("car-select");
+        const calculateButton = document.getElementById("calculate-fare");
+        const receipt = document.getElementById("receipt")
+        const boarding = document.getElementById("boarding-point");
+        const destination = document.getElementById("destination-point");
+        const date = new Date();
+        const receiptDate =
+            date.getDate() + "/" +
+            (date.getMonth() + 1) + "/" +
+            date.getFullYear();
+
+        // 2. Attach the event listener directly in JavaScript
+        calculateButton.addEventListener("click", () => {
+            const selectedValue = carDropdown.value;
+            if (selectedValue === "none") {
+                receipt.innerHTML = `<p>Please choose a car first.</p>`;
+                return;
+            }
+            const boardingPoint = boarding.options[boarding.selectedIndex].text;
+            const selectedestination = destination.options[destination.selectedIndex].text;
+            if (boardingPoint === selectedestination) {
+                receipt.innerHTML = `<p>Please choose a valid destination.</p>`;
+                return;
+            }
+            if (boardingPoint === "--boarding point--") {
+                receipt.innerHTML = `<p>Please choose a boarding point.</p>`;
+                return;
+            }
+            if (selectedestination === "--destination--") {
+                receipt.innerHTML = `<p>Please choose a valid destination.</p>`;
+                return;
+            }
+            const meters = distancematrix[boardingPoint]?.[selectedestination] || 1000;
+            const Multiplier = parseFloat(selectedValue);
+            const ratePerMeter = 0.2
+            const carName = carDropdown.options[carDropdown.selectedIndex].text;
+            const finalCost = meters * Multiplier * ratePerMeter;
+            const message = `${carName} (multiplier) ${Multiplier}x. Cost:$ ${finalCost}`;
+            receipt.style.display = "block"
+            receipt.innerHTML = `
+            <h1 style="color:#ffcc00; font-size:24px; text-align:center">Receipt</h1>
+            <p><strong>Boarding Point: </strong>${boardingPoint}</p>
+            <p><strong>Destination: </strong>${selectedestination}</p>    
+            <p><strong>Selected car: </strong>${carName}<sup style="font-size: 12px; color:grey;">#</sup></p>
+            <hr style="border: 0; border-top: 1px solid grey; margin: 8px 0;">
+            <p><strong>Total Distance: </strong>${meters}m<p>   
+            <p><strong>Total Fare: </strong><span style="color:yellow; font-family:Segoe UI;">$${finalCost.toFixed(2)}</span></p>
+            <p style="font-size:16px;"><strong>Contact No. :</strong>+rb1013453332(office)</p>
+            <p style="font-size:16px"><strong>Date:</strong> ${receiptDate}</p>
+            <p style="font-size:10px; color: grey; text-align:center">*Calculated via Taxi Boss Map v2.40</p>
+            <p style="font-size:10px; color: grey; text-align:center">#Depends on availiability of car</p> 
+            <p style="font-size:10px; color: grey; text-align:center">Please confirm your trip by calling on the given number.</p> 
+            `;
+           
+
+            const receiptData = {
+                boarding: boardingPoint,
+                destination: selectedestination,
+                car: carName,
+                distance: meters,
+                fare: finalCost.toFixed(2),
+                timestamp: receiptDate,
+            };
+
+            let receipts =
+                JSON.parse(localStorage.getItem("receipts")) || [];
+
+            receipts.push(receiptData);
+
+            localStorage.setItem(
+                "receipts",
+                JSON.stringify(receipts)
+            );
+        });
+    </script>
+</body>
+
+</html>
